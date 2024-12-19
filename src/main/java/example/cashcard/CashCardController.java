@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -68,6 +69,16 @@ class CashCardController {
 				PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
 						pageable.getSortOr(Sort.by(Sort.Direction.ASC, "amount"))));
 		return ResponseEntity.ok(page.getContent());
+	}
+	
+	@DeleteMapping("/{id}")
+	private ResponseEntity<Void> deleteCashCard(@PathVariable Long id, Principal principal){
+		if (cashCardRepository.existsByIdAndOwner(id, principal.getName())) {
+		    cashCardRepository.deleteById(id);
+		    return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+		
 	}
 	
 	private CashCard findCashCard( Long requestedId, Principal principal) {
